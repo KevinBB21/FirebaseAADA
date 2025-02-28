@@ -1,67 +1,81 @@
 package com.example.cursofirebaselite.presentation.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.cursofirebaselite.ui.theme.Black
-
 import com.example.cursofirebaselite.presentation.model.Album
 import com.google.firebase.firestore.FirebaseFirestore
 
-//Preview
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = HomeViewModel()) {
-
+fun HomeScreen(viewModel: HomeViewModel = HomeViewModel(), navController: NavController) {
     val albums: State<List<Album>> = viewModel.album.collectAsState()
 
-    Column(
-        Modifier
+    // Usamos Box para permitir el posicionamiento de los elementos
+    Box(
+        modifier = Modifier
             .fillMaxSize()
             .background(Black)
-    ){
-        Text("Albums Populares",
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp,
-            modifier = Modifier.padding(16.dp)
-        )
+    ) {
+        // Fila superior con el título y el botón de usuario
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Albums Populares",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp
+                )
 
+                // Botón para ir a ProfileScreen
+                Button(onClick = { navController.navigate("profile") }) {
+                    Text("Usuario")
+                }
+            }
 
+            LazyRow {
+                items(albums.value) {
+                    AlbumItem(it)
+                }
+            }
+        }
 
-        LazyRow {
-            items(albums.value){
-                AlbumItem(it)
-           }
+        // Botón flotante para añadir un álbum
+        FloatingActionButton(
+            onClick = { navController.navigate("add_album") }, // Aquí se navega a la pantalla de agregar álbum
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd), // Lo coloca en la esquina inferior derecha
+            contentColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Añadir Álbum")
         }
     }
-
 }
 
-
 @Composable
-fun AlbumItem(album: Album){
+fun AlbumItem(album: Album) {
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -96,39 +110,3 @@ fun AlbumItem(album: Album){
         }
     }
 }
-
-
-
-@Composable
-fun AlbumItemPreview(){
-    val album = Album(
-        "Album 1",
-        numberOfPhotos = 10,
-        imagen = "https://cdn.pixabay.com/photo/2019/12/24/13/20/dogs-4716738_640.jpg"
-
-    )
-    AlbumItem(album = album)
-}
-
-
-
-
-/*
-fun createAlbum(db: FirebaseFirestore) {
-    val random = (1 until 1000).random()
-    val album = Album("Album $random", numberOfPhotos =  random)
-    db.collection("albums")
-        .add(album)
-        .addOnSuccessListener { documentReference ->
-            println("DocumentSnapshot added with ID: ${documentReference.id}")
-        }
-        .addOnFailureListener { e ->
-            println("Error adding document $e")
-        }
-        .addOnCompleteListener(){
-            println("Task completed")
-
-      }
-}
-
-*/

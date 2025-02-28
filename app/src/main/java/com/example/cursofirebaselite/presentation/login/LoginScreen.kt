@@ -36,13 +36,14 @@ import com.example.cursofirebaselite.ui.theme.SelectedField
 import com.example.cursofirebaselite.ui.theme.UnselectedField
 import com.example.cursofirebaselite.R
 import com.google.firebase.auth.FirebaseAuth
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 @Composable
-fun LoginScreen(auth: FirebaseAuth, navController: NavController , navigateToHome:() -> Unit) {
+fun LoginScreen(auth: FirebaseAuth, navController: NavController, navigateToHome: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val db = FirebaseFirestore.getInstance() // Instancia de Firestore
 
     Column(
         modifier = Modifier
@@ -51,8 +52,7 @@ fun LoginScreen(auth: FirebaseAuth, navController: NavController , navigateToHom
             .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Row(){
+        Row {
             Icon(
                 painter = painterResource(id = R.drawable.ic_back_24),
                 contentDescription = "",
@@ -89,13 +89,28 @@ fun LoginScreen(auth: FirebaseAuth, navController: NavController , navigateToHom
         )
         Spacer(Modifier.height(48.dp))
         Button(onClick = {
-            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener{ task ->
-                if(task.isSuccessful){
-                    navigateToHome()
-                    Log.i("perro", "LOGIN OK")
-                }else{
-                    //Error
-                    Log.i("perro", "LOGIN KO")
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    user?.let {
+                        val userData = hashMapOf(
+                            "uid" to it.uid,
+                            "email" to it.email,
+                            "name" to it.displayName,
+                            "photoUrl" to it.photoUrl// Puedes agregar más datos si los tienes
+                        )
+                        db.collection("userprofile").document(it.uid).set(userData)
+                            .addOnSuccessListener {
+                                Log.i("Firestore", "Perfil guardado con éxito")
+                                navigateToHome()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "Error al guardar perfil", e)
+                            }
+                    }
+                    Log.i("Auth", "LOGIN OK")
+                } else {
+                    Log.i("Auth", "LOGIN KO", task.exception)
                 }
             }
         }) {

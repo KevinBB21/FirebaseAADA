@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.crashlytics)
 }
 
+
+
 android {
     namespace = "com.example.cursofirebaselite"
     compileSdk = 34
@@ -53,6 +55,9 @@ android {
 
 dependencies {
 
+    implementation (libs.google.firebase.bom)
+    implementation (libs.firebase.auth.ktx)
+    implementation (libs.firebase.firestore.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.auth)
@@ -62,6 +67,8 @@ dependencies {
 
     implementation(libs.coil)
 
+    implementation("com.google.firebase:firebase-auth:22.1.2") // Última versión de Firebase Auth
+    implementation("com.google.firebase:firebase-firestore:24.9.0") // Última versión de Firestore
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

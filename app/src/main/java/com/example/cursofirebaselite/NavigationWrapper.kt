@@ -2,14 +2,16 @@ package com.example.cursofirebaselite
 
 import android.provider.ContactsContract.Profile
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.aristidevs.cursofirebaselite.presentation.login.LoginScreen
+import com.example.cursofirebaselite.presentation.add.AddScreen
 import com.example.cursofirebaselite.presentation.home.HomeScreen
+import com.example.cursofirebaselite.presentation.home.HomeViewModel
 import com.example.cursofirebaselite.presentation.initial.InitialScreen
 import com.example.cursofirebaselite.presentation.perfil.ProfileScreen
-import com.example.cursofirebaselite.presentation.perfil.ProfileViewModel
 import com.example.cursofirebaselite.presentation.signup.SignupScreen
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -32,10 +34,13 @@ fun NavigationWrapper(
             SignupScreen(auth, navHostController)
         }
         composable("home"){
-            HomeScreen()
+            HomeScreen(navController = navHostController)
         }
         composable("profile"){
             ProfileScreen()
+        }
+        composable("add_album"){
+            AddScreen()
         }
     }
 }
